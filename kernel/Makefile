@@ -39,19 +39,21 @@ endif
 
 ifndef KSU_EXPECTED_SIZE
 KSU_EXPECTED_SIZE := 0x033b
-endif
-
-ifndef KSU_EXPECTED_HASH
 KSU_EXPECTED_HASH := c371061b19d8c7d7d6133c6a9bafe198fa944e50c1b31c9d8daa8d7f1fc2d2d6
-endif
+
+# rsuntk/KernelSU
+KSU_EXPECTED_SIZE_CUST := 0x396
+KSU_EXPECTED_HASH_CUST := f415f4ed9435427e1fdf7f1fccd4dbc07b3d6b8751e4dbcec6f19671f427870b
 
 ifdef KSU_MANAGER_PACKAGE
 ccflags-y += -DKSU_MANAGER_PACKAGE=\"$(KSU_MANAGER_PACKAGE)\"
 $(info -- KernelSU Manager package name: $(KSU_MANAGER_PACKAGE))
 endif
 
-$(info -- KernelSU Manager signature size: $(KSU_EXPECTED_SIZE))
-$(info -- KernelSU Manager signature hash: $(KSU_EXPECTED_HASH))
+$(info -- Official KernelSU Manager signature size: $(KSU_EXPECTED_SIZE))
+$(info -- Official KernelSU Manager signature hash: $(KSU_EXPECTED_HASH))
+$(info -- Custom KernelSU Manager signature size: $(KSU_EXPECTED_SIZE_CUST))
+$(info -- Custom KernelSU Manager signature hash: $(KSU_EXPECTED_HASH_CUST))
 
 ccflags-y += -DEXPECTED_SIZE=$(KSU_EXPECTED_SIZE)
 ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"

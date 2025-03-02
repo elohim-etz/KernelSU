@@ -403,6 +403,7 @@ private fun ModuleList(
         val result = snackBarHost.showSnackbar(
             message = message,
             actionLabel = actionLabel,
+            withDismissAction = true,
             duration = SnackbarDuration.Long
         )
         if (result == SnackbarResult.ActionPerformed) {
@@ -486,6 +487,7 @@ private fun ModuleList(
                                         val result = snackBarHost.showSnackbar(
                                             message = rebootToApply,
                                             actionLabel = reboot,
+                                            withDismissAction = true,
                                             duration = SnackbarDuration.Long
                                         )
                                         if (result == SnackbarResult.ActionPerformed) {

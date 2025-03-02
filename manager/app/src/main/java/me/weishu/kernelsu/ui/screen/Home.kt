@@ -100,8 +100,8 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 UpdateCard()
             }
             InfoCard()
+            UnofficialCard()
             DonateCard()
-            LearnMoreCard()
             Spacer(Modifier)
         }
     }
@@ -247,7 +247,7 @@ private fun StatusCard(
                     }
 
                     val workingMode = when (lkmMode) {
-                        null -> ""
+                        null -> " <Next>"
                         true -> " <LKM>"
                         else -> " <GKI>"
                     }
@@ -337,34 +337,6 @@ fun WarningCard(
 }
 
 @Composable
-fun LearnMoreCard() {
-    val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_learn_kernelsu_url)
-
-    ElevatedCard {
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                uriHandler.openUri(url)
-            }
-            .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_learn_kernelsu),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_click_to_learn_kernelsu),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun DonateCard() {
     val uriHandler = LocalUriHandler.current
 
@@ -384,6 +356,33 @@ fun DonateCard() {
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.home_support_content),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun UnofficialCard() {
+    val uriHandler = LocalUriHandler.current
+
+    ElevatedCard {
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                uriHandler.openUri("https://github.com/rsuntk/KernelSU")
+            }
+            .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Text(
+                    text = stringResource(R.string.home_unofficial_title),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.home_unofficial_content),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

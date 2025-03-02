@@ -8,7 +8,7 @@
     <string name="home_superuser_count">SuperUser: %d</string>
     <string name="home_module_count">Modul: %d</string>
     <string name="home_unsupported">Tidak didukung</string>
-    <string name="home_unsupported_reason">KernelSU saat ini hanya mendukung kernel GKI</string>
+    <string name="home_unsupported_reason">Tidak ada driver KernelSU terdeteksi, salah kernel?</string>
     <string name="home_kernel">Kernel</string>
     <string name="home_manager_version">Versi manager</string>
     <string name="home_fingerprint">Identitas</string>
@@ -49,6 +49,8 @@
     <string name="home_learn_kernelsu">Pelajari KernelSU</string>
     <string name="home_learn_kernelsu_url">https://kernelsu.org/id_ID/guide/what-is-kernelsu.html</string>
     <string name="home_click_to_learn_kernelsu">Pelajari cara instal KernelSU dan menggunakan modul</string>
+    <string name="home_unofficial_title">KernelSU tidak resmi</string>
+    <string name="home_unofficial_content">Telah dimodifikasi oleh Rissu untuk kernel non-GKI.</string>
     <string name="home_support_title">Dukung Kami</string>
     <string name="home_support_content">KernelSU akan selalu menjadi aplikasi gratis dan terbuka. Anda dapat memberikan donasi sebagai bentuk dukungan.</string>
     <string name="about_source_code"><![CDATA[Lihat kode sumber di %1$s<br/>Gabung kanal %2$s kami]]></string>
