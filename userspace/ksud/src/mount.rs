@@ -107,7 +107,7 @@ pub fn mount_overlayfs(
     if let (Some(upperdir), Some(workdir)) = (upperdir, workdir) {
        data = format!("{data},upperdir={upperdir},workdir={workdir}");
      }
-    mount(KSU_OVERLAY_SOURCE, dest.as_ref(), "overlay", MountFlags::empty(), &data)?;
+    mount(KSU_OVERLAY_SOURCE, dest.as_ref(), "erofs", MountFlags::empty(), &data)?;
     
     Ok(())
 }
