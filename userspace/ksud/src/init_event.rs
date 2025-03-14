@@ -1,3 +1,4 @@
+use crate::defs::{NO_MOUNT_PATH, NO_TMPFS_PATH};
 use anyhow::{Context, Result, bail};
 use log::{info, warn};
 use std::{collections::HashMap, path::Path};
@@ -191,8 +192,12 @@ pub fn on_post_data_fs() -> Result<()> {
     }
 
     // mount temp dir
-    if let Err(e) = mount::mount_tmpfs(defs::TEMP_DIR) {
-        warn!("do temp dir mount failed: {}", e);
+    if !Path::new(NO_TMPFS_PATH).exists() {
+       if let Err(e) = mount::mount_tmpfs(defs::TEMP_DIR) {
+          warn!("do temp dir mount failed: {}", e);
+       }
+    } else {
+        info!("no tmpfs requested");
     }
 
     // exec modules post-fs-data scripts
@@ -206,10 +211,13 @@ pub fn on_post_data_fs() -> Result<()> {
         warn!("load system.prop failed: {}", e);
     }
 
-    // mount module systemlessly by overlay
-    if let Err(e) = mount_modules_systemlessly(module_dir) {
-        warn!("do systemless mount failed: {}", e);
-    }
+    if !Path::new(NO_MOUNT_PATH).exists() {
+       if let Err(e) = mount_modules_systemlessly(module_dir) {
+           warn!("do systemless mount failed: {}", e);
+       }
+     } else {
+       info!("no mount requested");
+     }
 
     run_stage("post-mount", true);
 
