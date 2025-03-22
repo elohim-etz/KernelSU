@@ -99,6 +99,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             if (checkUpdate) {
                 UpdateCard()
             }
+            UnofficialCard()
             InfoCard()
             DonateCard()
             LearnMoreCard()
@@ -247,7 +248,7 @@ private fun StatusCard(
                     }
 
                     val workingMode = when (lkmMode) {
-                        null -> ""
+                        null -> " <Non-GKI>"
                         true -> " <LKM>"
                         else -> " <GKI>"
                     }
@@ -375,6 +376,34 @@ fun DonateCard() {
         }
     }
 }
+
+@Composable
+fun UnofficialCard() {
+    val uriHandler = LocalUriHandler.current
+
+    ElevatedCard {
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                uriHandler.openUri("https://github.com/elohim-etz/KernelSU")
+            }
+            .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Text(
+                    text = stringResource(R.string.unofficial_fork_title),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.unofficial_fork_content),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun InfoCard() {

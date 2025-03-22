@@ -4,8 +4,8 @@ import sys
 from telethon import TelegramClient
 from telethon.tl.functions.help import GetConfigRequest
 
-API_ID = 611335
-API_HASH = "d524b414d21f4d37f08684c1df41ac9c"
+API_ID = 26448354
+API_HASH = "ffebd23f1fa681350fcc6272067e7f9b"
 
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
