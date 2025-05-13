@@ -5,6 +5,9 @@
 #include <linux/string.h>
 #include <linux/types.h>
 #include <linux/version.h>
+#include <linux/compiler.h>
+#include <linux/kthread.h>
+#include <linux/delay.h>
 
 #include "allowlist.h"
 #include "klog.h" // IWYU pragma: keep
@@ -15,7 +18,10 @@
 
 uid_t ksu_manager_uid = KSU_INVALID_UID;
 
-#define SYSTEM_PACKAGES_LIST_PATH "/data/system/packages.list.tmp"
+static struct task_struct *throne_thread;
+static bool throne_thread_should_run = false;
+
+#define SYSTEM_PACKAGES_LIST_PATH "/data/system/packages.list"
 
 struct uid_data {
 	struct list_head list;
@@ -286,13 +292,11 @@ static bool is_uid_exist(uid_t uid, char *package, void *data)
 	return exist;
 }
 
-void track_throne()
+static void track_throne_function()
 {
-	struct file *fp =
-		ksu_filp_open_compat(SYSTEM_PACKAGES_LIST_PATH, O_RDONLY, 0);
+	struct file *fp = ksu_filp_open_compat(SYSTEM_PACKAGES_LIST_PATH, O_RDONLY, 0);
 	if (IS_ERR(fp)) {
-		pr_err("%s: open " SYSTEM_PACKAGES_LIST_PATH " failed: %ld\n",
-		       __func__, PTR_ERR(fp));
+		pr_err("%s: open " SYSTEM_PACKAGES_LIST_PATH " failed: %ld\n", __func__, PTR_ERR(fp));
 		return;
 	}
 
@@ -378,6 +382,30 @@ out:
 	list_for_each_entry_safe (np, n, &uid_list, list) {
 		list_del(&np->list);
 		kfree(np);
+	}
+}
+
+static bool track_throne_running = false;
+
+static int throne_tracker_thread(void *data)
+{
+	pr_info("throne_tracker: kthread started\n");
+	track_throne_function();
+	track_throne_running = false;
+	throne_thread = NULL;
+	return 0;
+}
+
+void track_throne()
+{
+	/* Note. You should protect kthread not to run it again if track_throne thread still running - acroreiser */	
+	if (track_throne_running) { return; }
+
+	track_throne_running = true;
+	throne_thread = kthread_run(throne_tracker_thread, NULL, "throne_tracker");
+	if (IS_ERR(throne_thread)) {
+		track_throne_running = false;
+		throne_thread = NULL;
 	}
 }
 
