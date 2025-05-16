@@ -25,6 +25,15 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: upx pack shit
+      run: |
+        rm -rf ./userspace/ksud/bin/*/ksuinit ./userspace/ksud/bin/*/bootctl ./userspace/ksud/bin/x86_64
+        for binary in ./userspace/ksud/bin/*/*; do 
+        	chmod +x $binary
+        	upx -1 $binary
+        done
+        ls -lha ./userspace/ksud/bin/*/*
+      
     - name: Download artifacts
       uses: actions/download-artifact@v4
     
