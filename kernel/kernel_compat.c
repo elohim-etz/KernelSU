@@ -187,3 +187,12 @@ const struct cred *ksu_get_cred_rcu(const struct cred *cred)
 	return ret;
 #endif
 }
+
+int ksu_access_ok(const void *addr, unsigned long size)
+{
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
+	return access_ok(VERIFY_READ, addr, size);
+#else
+	return access_ok(addr, size);
+#endif
+}
