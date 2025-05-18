@@ -6,6 +6,8 @@
 #include "linux/version.h"
 #include "linux/key.h"
 
+extern int ksu_access_ok(const void *addr, unsigned long size);
+
 extern long ksu_strncpy_from_user_nofault(char *dst,
 					  const void __user *unsafe_addr,
 					  long count);
