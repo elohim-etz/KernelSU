@@ -63,8 +63,11 @@ int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
 	}
 
 	char path[sizeof(su) + 1];
-	memset(path, 0, sizeof(path));
-	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	long len = ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	if (len <= 0)
+		return 0;
+
+	path[sizeof(path) - 1] = '\0';
 
 	if (unlikely(!memcmp(path, su, sizeof(su)))) {
 		pr_info("faccessat su->sh!\n");
@@ -91,8 +94,11 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
 	}
 
 	char path[sizeof(su) + 1];
-	memset(path, 0, sizeof(path));
-	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	long len = ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	if (len <= 0)
+		return 0;
+
+	path[sizeof(path) - 1] = '\0';
 
 	if (unlikely(!memcmp(path, su, sizeof(su)))) {
 		pr_info("newfstatat su->sh!\n");
@@ -114,6 +120,9 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	if (unlikely(!ksu_sucompat_non_kp))
 		return 0;
 	
+	if (!ksu_is_allow_uid(current_uid().val))
+		return 0;
+
 	if (unlikely(!filename_ptr))
 		return 0;
 
@@ -123,9 +132,6 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	}
 
 	if (likely(memcmp(filename->name, su, sizeof(su))))
-		return 0;
-
-	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
 
 	pr_info("do_execveat_common su found\n");
@@ -145,6 +151,9 @@ int ksu_handle_execve_sucompat(int *fd, const char __user **filename_user,
 
 	if (unlikely(!ksu_sucompat_non_kp))
 		return 0;
+
+	if (!ksu_is_allow_uid(current_uid().val))
+		return 0;
 	
 	if (unlikely(!filename_user))
 		return 0;
@@ -153,9 +162,6 @@ int ksu_handle_execve_sucompat(int *fd, const char __user **filename_user,
 	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
 
 	if (likely(memcmp(path, su, sizeof(su))))
-		return 0;
-
-	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
 
 	pr_info("sys_execve su found\n");
