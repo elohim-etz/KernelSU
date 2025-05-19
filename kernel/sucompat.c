@@ -114,6 +114,9 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	if (unlikely(!ksu_sucompat_non_kp))
 		return 0;
 	
+	if (!ksu_is_allow_uid(current_uid().val))
+		return 0;
+
 	if (unlikely(!filename_ptr))
 		return 0;
 
@@ -123,9 +126,6 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 	}
 
 	if (likely(memcmp(filename->name, su, sizeof(su))))
-		return 0;
-
-	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
 
 	pr_info("do_execveat_common su found\n");
@@ -144,6 +144,9 @@ int ksu_handle_execve_sucompat(int *fd, const char __user **filename_user,
 	char path[sizeof(su) + 1];
 
 	if (unlikely(!ksu_sucompat_non_kp))
+		return 0;
+
+	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
 	
 	if (unlikely(!filename_user))
@@ -170,9 +173,6 @@ int ksu_handle_execve_sucompat(int *fd, const char __user **filename_user,
 	path[sizeof(path) - 1] = '\0';
 
 	if (likely(memcmp(path, su, sizeof(su))))
-		return 0;
-
-	if (!ksu_is_allow_uid(current_uid().val))
 		return 0;
 
 	pr_info("sys_execve su found\n");
