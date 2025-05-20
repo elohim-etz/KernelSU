@@ -270,7 +270,27 @@ static int __ksu_handle_execveat_ksud(int *fd, char *filename,
 	return 0;
 }
 
-// keep this for manually hooked builds
+#ifdef KSU_USE_STRUCT_FILENAME
+/*
+ * DEPRECATION NOTICE:
+ * This function (ksu_handle_execveat_ksud) is deprecated and retained only for 
+ * compatibility with legacy hooks that uses struct filename.
+ * New builds should use ksu_handle_execve_ksud() and ksu_handle_compat_execve_ksud()
+ *
+ * This wrapper may be removed in future rebases.
+ *
+ * Quoting a weird take for posterity:
+ *
+ *   "The first member of the struct filename is name, so the pointer to the struct
+ *    points to name. This creates an implicit dependency. Although it may remain
+ *    the same indefinitely, any change will cause a panic. The benefits apply only
+ *    to pre-3.7 kernels, making it not worth the effort."
+ * 	- https://github.com/tiann/KernelSU/pull/2595#issuecomment-2888960286
+ *
+ * Okay. He actually thinks that that's a *good* thing?
+ * Incredible. Weaponized optimism in C.
+ *
+ */
 __maybe_unused int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
 			     struct user_arg_ptr *argv, struct user_arg_ptr *envp,
 			     int *flags)
@@ -289,6 +309,7 @@ __maybe_unused int ksu_handle_execveat_ksud(int *fd, struct filename **filename_
 
 	return __ksu_handle_execveat_ksud(fd, (char *)filename->name, argv, envp, flags);
 }
+#endif // KSU_USE_STRUCT_FILENAME
 
 static ssize_t (*orig_read)(struct file *, char __user *, size_t, loff_t *);
 static ssize_t (*orig_read_iter)(struct kiocb *, struct iov_iter *);

@@ -56,6 +56,15 @@ $(info -- KernelSU Manager signature hash: $(KSU_EXPECTED_HASH))
 ccflags-y += -DEXPECTED_SIZE=$(KSU_EXPECTED_SIZE)
 ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
 
+# enable functions that use stuct filename when ksu_handle_execveat is found
+ifeq ($(shell grep -q "ksu_handle_execveat" $(srctree)/fs/exec.c; echo $$?),0)
+ccflags-y += -DKSU_USE_STRUCT_FILENAME
+endif
+
+ifeq ($(shell grep -q "ksu_handle_execveat" $(srctree)/arch/arm/kernel/sys_arm.c; echo $$?),0)
+ccflags-y += -DKSU_USE_STRUCT_FILENAME
+endif
+
 ifneq ($(shell grep -q "get_cred_rcu" $(srctree)/include/linux/cred.h; echo $$?),0)
 $(error You must backport get_cred_rcu - https://github.com/tiann/KernelSU/pull/2320#issuecomment-2564232958 )
 endif
