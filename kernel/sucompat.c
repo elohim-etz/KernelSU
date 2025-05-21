@@ -63,8 +63,11 @@ int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
 	}
 
 	char path[sizeof(su) + 1];
-	memset(path, 0, sizeof(path));
-	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	long len = ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	if (len <= 0)
+		return 0;
+
+	path[sizeof(path) - 1] = '\0';
 
 	if (unlikely(!memcmp(path, su, sizeof(su)))) {
 		pr_info("faccessat su->sh!\n");
@@ -91,8 +94,11 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
 	}
 
 	char path[sizeof(su) + 1];
-	memset(path, 0, sizeof(path));
-	ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	long len = ksu_strncpy_from_user_nofault(path, *filename_user, sizeof(path));
+	if (len <= 0)
+		return 0;
+
+	path[sizeof(path) - 1] = '\0';
 
 	if (unlikely(!memcmp(path, su, sizeof(su)))) {
 		pr_info("newfstatat su->sh!\n");
