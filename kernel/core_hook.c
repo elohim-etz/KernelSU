@@ -224,6 +224,7 @@ LSM_HANDLER_TYPE ksu_handle_rename(struct dentry *old_dentry, struct dentry *new
 	return 0;
 }
 
+#if defined(KSU_HAS_MODERN_EXT4) && defined(CONFIG_EXT4_FS)
 static void nuke_ext4_sysfs() {
 	struct path path;
 	int err = kern_path("/data/adb/modules", 0, &path);
@@ -243,6 +244,9 @@ static void nuke_ext4_sysfs() {
 	ext4_unregister_sysfs(sb);
  	path_put(&path);
 }
+#else
+static void nuke_ext4_sysfs() { }
+#endif
 
 LSM_HANDLER_TYPE ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 		     unsigned long arg4, unsigned long arg5)
