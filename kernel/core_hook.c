@@ -756,12 +756,6 @@ static void try_umount(const char *mnt, int flags)
 		return;
 	}
 
-#if defined(CONFIG_KSU_SUSFS_TRY_UMOUNT) && defined(CONFIG_KSU_SUSFS_ENABLE_LOG)
-	if (susfs_is_log_enabled) {
-		pr_info("susfs: umounting '%s' for uid: %d\n", mnt, uid);
-	}
-#endif
-
 #ifdef KSU_HAS_PATH_UMOUNT
 	ksu_path_umount(mnt, &path, flags);
 #else
@@ -869,7 +863,11 @@ out_ksu_try_umount:
 #endif
 
 	list_for_each_entry_safe(entry, tmp, &mount_list, list) {
+#ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
+		ksu_try_umount(entry->umountable, NULL, MNT_DETACH, new_uid.val);
+#else
 		try_umount(entry->umountable, MNT_DETACH);
+#endif
 		// don't free! keep on heap! this is used on subsequent setuid calls
 		// if this is freed, we dont have anything to umount next
 		// FIXME: might leak, refresh the list?
