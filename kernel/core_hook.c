@@ -536,6 +536,7 @@ static void try_umount(const char *mnt, int flags)
 	}
 
 	if (path.dentry != path.mnt->mnt_root) {
+		path_put(&path);
 		// it is not root mountpoint, maybe umounted by others already.
 		return;
 	}
@@ -545,6 +546,7 @@ static void try_umount(const char *mnt, int flags)
 #else
 	ksu_sys_umount(mnt, flags);
 #endif
+	path_put(&path);
 }
 
 struct mount_entry {
