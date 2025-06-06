@@ -124,42 +124,7 @@ pub fn on_post_data_fs() -> Result<()> {
         }
     }
 
-    let module_update_img = defs::MODULE_UPDATE_IMG;
-    let module_img = defs::MODULE_IMG;
-    let module_dir = defs::MODULE_DIR;
-    let module_update_flag = Path::new(defs::WORKING_DIR).join(defs::UPDATE_FILE_NAME);
-
-    // modules.img is the default image
-    let mut target_update_img = &module_img;
-
-    // we should clean the module mount point if it exists
-    ensure_clean_dir(module_dir)?;
-
     assets::ensure_binaries(true).with_context(|| "Failed to extract bin assets")?;
-
-    if Path::new(module_update_img).exists() {
-        if module_update_flag.exists() {
-            // if modules_update.img exists, and the the flag indicate this is an update
-            // this make sure that if the update failed, we will fallback to the old image
-            // if we boot succeed, we will rename the modules_update.img to modules.img #on_boot_complete
-            target_update_img = &module_update_img;
-            // And we should delete the flag immediately
-            std::fs::remove_file(module_update_flag)?;
-        } else {
-            // if modules_update.img exists, but the flag not exist, we should delete it
-            std::fs::remove_file(module_update_img)?;
-        }
-    }
-
-    if !Path::new(target_update_img).exists() {
-        return Ok(());
-    }
-
-    // we should always mount the module.img to module dir
-    // becuase we may need to operate the module dir in safe mode
-    info!("mount module image: {target_update_img} to {module_dir}");
-    mount::AutoMountExt4::try_new(target_update_img, module_dir, false)
-        .with_context(|| "mount module image failed".to_string())?;
 
     // tell kernel that we've mount the module, so that it can do some optimization
     ksucalls::report_module_mounted();
@@ -249,17 +214,6 @@ pub fn on_services() -> Result<()> {
 pub fn on_boot_completed() -> Result<()> {
     ksucalls::report_boot_complete();
     info!("on_boot_completed triggered!");
-    let module_update_img = Path::new(defs::MODULE_UPDATE_IMG);
-    let module_img = Path::new(defs::MODULE_IMG);
-    if module_update_img.exists() {
-        // this is a update and we successfully booted
-        if std::fs::rename(module_update_img, module_img).is_err() {
-            warn!("Failed to rename images, copy it now.",);
-            utils::copy_sparse_file(module_update_img, module_img, false)
-                .with_context(|| "Failed to copy images")?;
-            std::fs::remove_file(module_update_img).with_context(|| "Failed to remove image!")?;
-        }
-    }
 
     run_stage("boot-completed", false);
 
