@@ -516,7 +516,7 @@ __maybe_unused static int __ksu_handle_execve_ksud(const char __user *filename_u
 	if (!filename_user)
 		return 0;
 
-	long len = ksu_strncpy_from_user_nofault(path, filename_user, 32);
+	long len = strncpy_from_user(path, filename_user, 32);
 	if (len <= 0)
 		return 0;
 
