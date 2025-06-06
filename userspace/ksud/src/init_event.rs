@@ -5,7 +5,7 @@ use std::{collections::HashMap, path::Path};
 use crate::module::prune_modules;
 use crate::{
     assets, defs, ksucalls, mount, restorecon,
-    utils::{self, ensure_clean_dir},
+    utils::{self},
 };
 
 fn mount_partition(partition_name: &str, lowerdir: &Vec<String>) -> Result<()> {
@@ -124,6 +124,7 @@ pub fn on_post_data_fs() -> Result<()> {
         }
     }
 
+    let module_dir = defs::MODULE_DIR;
     assets::ensure_binaries(true).with_context(|| "Failed to extract bin assets")?;
 
     // tell kernel that we've mount the module, so that it can do some optimization
