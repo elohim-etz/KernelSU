@@ -229,28 +229,3 @@ pub fn uninstall(magiskboot_path: Option<PathBuf>) -> Result<()> {
     Ok(())
 }
 
-#[cfg(any(target_os = "linux", target_os = "android"))]
-fn copy_xattrs(src_path: impl AsRef<Path>, dest_path: impl AsRef<Path>) -> Result<()> {
-    use rustix::path::Arg;
-    let std::result::Result::Ok(xattrs) = extattr::llistxattr(src_path.as_ref()) else {
-        return Ok(());
-    };
-    for xattr in xattrs {
-        let std::result::Result::Ok(value) = extattr::lgetxattr(src_path.as_ref(), &xattr) else {
-            continue;
-        };
-        log::info!(
-            "Set {:?} xattr {} = {}",
-            dest_path.as_ref(),
-            xattr.to_string_lossy(),
-            value.to_string_lossy(),
-        );
-        if let Err(e) =
-            extattr::lsetxattr(dest_path.as_ref(), &xattr, &value, extattr::Flags::empty())
-        {
-            log::warn!("Failed to set xattr: {}", e);
-        }
-    }
-    Ok(())
-}
-

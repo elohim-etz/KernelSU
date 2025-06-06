@@ -2,7 +2,7 @@ use anyhow::{Context, Result, bail};
 use log::{info, warn};
 use std::{collections::HashMap, path::Path};
 
-use crate::module::prune_modules;
+use crate::module::{handle_updated_modules, prune_modules};
 use crate::{
     assets, defs, ksucalls, mount, restorecon,
     utils::{self},
@@ -141,6 +141,10 @@ pub fn on_post_data_fs() -> Result<()> {
 
     if let Err(e) = prune_modules() {
         warn!("prune modules failed: {}", e);
+    }
+
+    if let Err(e) = handle_updated_modules() {
+        warn!("handle updated modules failed: {}", e);
     }
 
     if let Err(e) = restorecon::restorecon() {
