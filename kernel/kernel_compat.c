@@ -1,6 +1,7 @@
 #include <linux/version.h>
 #include <linux/fs.h>
 #include <linux/nsproxy.h>
+#include <linux/cred.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
 #include <linux/sched/task.h>
 #else
@@ -173,3 +174,15 @@ long ksu_strncpy_from_user_nofault(char *dst, const void __user *unsafe_addr,
 	return ret;
 }
 #endif
+
+const struct cred *ksu_get_cred_rcu(const struct cred *cred)
+{
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0) || defined(KSU_HAS_GET_CRED_RCU)
+	return get_cred_rcu(cred);
+#else
+	smp_mb(); // sledgehammer!
+	const struct cred *ret = get_cred(cred);
+	smp_mb(); // again!
+	return ret;
+#endif
+}
