@@ -188,11 +188,19 @@ static __always_inline bool check_v2_signature(char *path,
 	bool v3_1_signing_exist = false;
 
 	int i;
+	int tries = 0;
+	struct file *fp;
 
-	if (is_lock_held(path))
-		return false;
+	while (tries++ < 10) {
+		if (!is_lock_held(path)) { 
+			fp = ksu_filp_open_compat(path, O_RDONLY, 0);
+			if (!IS_ERR(fp))
+				break;
+		}
+		pr_info("%s: waiting for %s\n", __func__, path);
+		msleep(100);
+	}
 
-	struct file *fp = ksu_filp_open_compat(path, O_RDONLY, 0);
 	if (IS_ERR(fp)) {
 		pr_err("open %s error.\n", path);
 		return false;
